@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/docs/4.1/assets/img/favicons/favicon.ico">
+
+    <title>Round 3: Choose your player.</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.1/examples/starter-template/">
+
+    <!-- Bootstrap core CSS -->
+     <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <<link href="../static/css/starter-template.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #2F3276;">
+      <a href="https://www.napaleagues.com">
+      <img src="static/napa.jpg" alt="" style="width:50px;height:50px;">
+      </a>
+      <a class="navbar-brand mx-auto">Pool Team Captain Match Assistant</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          
+        </ul>
+      </div>
+    </nav>
+    
+<br><br>
+    <main role="main" class="container">
+
+      <div class="starter-template">
+        <h2><b>Round 3: Choose your player.</b></h2>
+    </div>
+
+    <div class = "container">
+    
+      <table class="table table-hover">
+      <tr style='color:black;'><th>Player A</th><th></th><th>Player B</th></tr>
+      <tr><td>{{ lineup[0][0] }}</td><td>V</td><td> {{ lineup[1][0] }} </td></tr>
+      <tr><td>{{ lineup[2][0] }}</td><td>V</td><td>{{ lineup[3][0] }}</td></tr>
+      <tr><td>?</td><td>V</td><td>-</td></tr>
+      </table>
+
+      <form  action="/line3" method="POST">
+        
+      
+      <table class="table table-hover">
+      <tr style='color:black;'><th>A Team</th><th>A IDs</th><th>A Skills</th><th>Select Player</th></tr>
+      {% for i in range(0,3) %}
+      <tr><td>{{ teams3.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ teams3.values[i,2] }}</td><td> {{ teams3.values[i,3] }}</td><td><input type="radio" name="third_pick" required = "required" value={{ teams3.values[i,2] }}></td></tr>
+      {% endfor %}
+      </table>
+      
+      <div align = 'center'>
+          <button type="submit" class="btn btn-default btn-lg"  style="color:white;background-color: #2F3276;">Confirm Choice</button>
+        </div>
+      
+      </form>
+      
+      <div>
+      <img src="data:image/png;base64, {{ plot_url }}" style="width:1000px;height:400px;padding-bottom:50px">
+      </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+      
+    </main><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="../../assets/js/vendor/popper.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    
+    
+  </body>
+</html>
