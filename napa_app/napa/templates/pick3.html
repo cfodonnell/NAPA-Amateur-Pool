@@ -56,9 +56,9 @@
         
       
       <table class="table table-hover">
-      <tr style='color:black;'><th>A Team</th><th>A IDs</th><th>A Skills</th><th>Select Player</th></tr>
+      <tr style='color:black;'><th>Select Player</th><th>A Team</th><th>A IDs</th></tr>
       {% for i in range(0,3) %}
-      <tr><td>{{ teams3.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ teams3.values[i,2] }}</td><td> {{ teams3.values[i,3] }}</td><td><input type="radio" name="third_pick" required = "required" value={{ teams3.values[i,2] }}></td></tr>
+      <tr><td><input type="radio" name="third_pick" required = "required" value={{ teams3.values[i,1] }}></td><td>{{ teams3.values[i,0] }} <b>{{rec[i]}}</b></td><td>{{ teams3.values[i,1] }}</td></tr>
       {% endfor %}
       </table>
       

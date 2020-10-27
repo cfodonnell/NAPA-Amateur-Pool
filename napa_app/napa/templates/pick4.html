@@ -57,9 +57,9 @@
         
       
       <table class="table table-hover">
-      <tr style='color:black;'><th>Player A</th><th>Player B</th><th>Score coefficient</th></tr>
+      <tr style='color:black;'><th>Select Player</th><th>Player A</th><th>Player B</th><th>Score coefficient</th></tr>
       {% for i in range(0,2) %}
-      <tr><td>{{ options.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ options.values[i,4] }}</td><td> {{ "{0:.2f}".format(options.values[i,5]) }}</td><td><input type="radio" name="fourth_pick" required = "required" value= {{ options.values[i,2] }} </td></tr>
+      <tr><td><input type="radio" name="fourth_pick" required = "required" value= {{ options.values[i,0] }} </td><td>{{ options.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ options.values[i,2] }}</td><td> {{ "{0:.2f}".format(options.values[i,3]) }}</td></tr>
       {% endfor %}
       </table>
       

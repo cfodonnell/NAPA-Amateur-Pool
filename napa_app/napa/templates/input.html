@@ -54,13 +54,16 @@
       <tr> <th><input type="text" id="player_3a" name='player_3a' size=5> </th> <th><input type="text" id="player_3b" name='player_3b' size=5> </th></tr>
       <tr> <th><input type="text" id="player_4a" name='player_4a' size=5> </th> <th><input type="text" id="player_4b" name='player_4b' size=5> </th></tr>
       <tr> <th><input type="text" id="player_5a" name='player_5a' size=5> </th> <th><input type="text" id="player_5b" name='player_5b' size=5> </th></tr>
+      <tr> <th><input type="checkbox" name="random_a" value=1> Create Random Team<br> </th> <th><input type="checkbox" name="random_b" value=1> Create Random Team<br> </th></tr>
       </table>
 
         <div align = 'center'>
           <button type="submit" class="btn btn-default btn-lg" style="color:white;background-color: #2F3276;">Load Teams</button>
+          <p style="color:red;"> {{error_message}} </p>
         </div>
 
       </form>
+      
     </div>
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>

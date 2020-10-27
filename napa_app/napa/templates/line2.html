@@ -54,9 +54,9 @@
       <form  action="/pick2" method="POST">
       
       <table class="table table-hover">
-      <tr style='color:black;'><th>B Team</th><th>B IDs</th><th>B Skills</th><th>Select Player</th></tr>
+      <tr style='color:black;'><th>B Team</th><th>B IDs</th><th>Select Player</th></tr>
       {% for i in range(0,4) %}
-      <tr><td>{{ teamb.values[i,1] }}</td><td>{{ teamb.values[i,2] }}</td><td> {{ teamb.values[i,3] }}</td><td><input type="radio" name="second_pick" required = "required" value= {{ teamb.values[i,2] }} </td></tr>
+      <tr><td>{{ teamb.values[i,1] }}</td><td>{{ teamb.values[i,2] }}</td><td><input type="radio" name="second_pick" required = "required" value= {{ teamb.values[i,2] }} </td></tr>
       {% endfor %}
       </table>
       

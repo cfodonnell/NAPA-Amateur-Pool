@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 import copy
 import psycopg2
+import names
 from itertools import permutations
 from sqlalchemy import create_engine
 
@@ -482,6 +483,20 @@ def create_sql_engine():
         pswd = cred[2]
     
     return create_engine('postgresql://%s:%s@localhost/%s'%(username,pswd,dbname))
+    
+def create_rand_team(num_players):
+    ''' Create a random team.'''
+    
+    rwins = np.random.rand(num_players)*100
+    rskills = np.random.randint(10,120,num_players)
+    rgames = np.random.randint(0,100,num_players)
+    rppm = rwins*0.14
+    rstate = [np.random.randint(0,25)]*num_players
+    rnames = [names.get_full_name() for i in range(0,num_players)]
+    rids = np.random.choice(range(0,1000),num_players, replace=False)
+    
+    return pd.DataFrame({'Name': rnames, 'ID': rids, 'Win %': rwins, '8 Skill': rskills, '8 Games': rgames,
+                         'AvgPPM': rppm, 'State': rstate})
 
 def get_all_perms(team_A_df, team_B_df):
     ''' Generate the predicted results summary dataframe for the permutation with highest 
@@ -526,22 +541,37 @@ def get_all_perms(team_A_df, team_B_df):
 
         names_a = team_A_df['Name'].values
         names_b = team_B_df['Name'].values[pm]
+        ids_a = team_A_df['ID'].values
+        ids_b = team_B_df['ID'].values[pm]
 
         #(score_a, score_b) = compare_scores(score_a, score_b)
         #(games_a, games_b) = compare_games(games_a, games_b, xa[:,0], xb[:,0])
 
         vec_int = np.vectorize(int)
         
-        perm_df = pd.DataFrame({'permutation': np.array([pm_num]*len(team_A_df)), 'player_a':names_a, 'race_a': vec_int(xa[:,0]), 'predicted_games_a': games_a,
+        perm_df = pd.DataFrame({'permutation': np.array([pm_num]*len(team_A_df)), 'player_a':names_a, 'id_a': ids_a, 'race_a': vec_int(xa[:,0]), 'predicted_games_a': games_a,
                  'predicted_points_a': score_a, 'predicted_points_b': score_b, 'predicted_games_b': games_b,
-                 'race_b': vec_int(xb[:,0]), 'player_b': names_b, 'score_coef': coefs})
+                 'race_b': vec_int(xb[:,0]), 'player_b': names_b, 'id_b': ids_b, 'score_coef': coefs})
         
         all_perms.append(perm_df)
     
+    
+    all_perms = pd.concat(all_perms)
     all_perms['result'] = all_perms['predicted_points_a'] - all_perms['predicted_points_b']
-    perm_score = all_perms.groupby('permutation')['result'].sum()    
+    perm_score = all_perms.groupby('permutation')['result'].sum() 
+    perm_coefs = all_perms.groupby('permutation')['score_coef'].sum()
+    perm_score = pd.merge(perm_score, perm_coefs, how='left',on='permutation')   
     engine = create_sql_engine()
-    pd.concat(all_perms).to_sql('all_perms', engine, if_exists='replace')
-    team_A_df[['Name', 'ID', '8 Skill']].to_sql('team_a', engine, if_exists='replace')
-    team_B_df[['Name', 'ID', '8 Skill']].to_sql('team_b', engine, if_exists='replace')
+    all_perms.to_sql('all_perms', engine, if_exists='replace')
+    
+    team_A_df = team_A_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
+    team_B_df = team_B_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
+    
+    team_A_df.to_sql('team_a', engine, if_exists='replace')
+    team_B_df.to_sql('team_b', engine, if_exists='replace')
     perm_score.to_sql('perm_score', engine, if_exists='replace')
+    
+    lineup = pd.DataFrame({'pos': np.arange(0,10), 'name': np.array(['']*10), 'id': np.zeros(10)})
+    lineup.to_sql('lineup', engine, if_exists='replace')
+    
+
