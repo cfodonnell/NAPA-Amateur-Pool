@@ -6,6 +6,8 @@ from io import BytesIO
 from flask import send_file
 from flask import request
 from napa import player_information as pi
+import matplotlib
+matplotlib.use('Agg') # required to solve multithreading issues with matplotlib within flask
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 sb.set_context("talk", font_scale = 1)
@@ -31,25 +33,19 @@ def get_team_info():
     # Retrieve ids from the input forms
     A = [request.form.get('player_' +str(i) +'a') for i in range(1,6)]
     B = [request.form.get('player_' +str(i) +'b') for i in range(1,6)]
-    #rand_a = int(request.form.get('random_a'))
-    #rand_b = int(request.form.get('random_b'))
     rand_a = request.form.get('random_a')
     rand_b = request.form.get('random_b') 
     
     try:
-        #if (rand_a == 1) & (rand_b == 1): # Two random teams
-        if (rand_a == '1') & (rand_b == '1'):
-            team_A_df = pi.create_rand_team(5)
-            team_B_df = pi.create_rand_team(5)
-        #elif rand_a == 1: # Team A is random, team B is real
-        elif rand_a == '1':
+        if (rand_a == '1') & (rand_b == '1'): # Two random teams
+            (team_A_df, team_B_df) = pi.create_two_rand_teams(5)
+        elif rand_a == '1': # Team A is random, team B is real
             team_A_df = pi.create_rand_team(5)
             team_B = [int(x) for x in B if x]
             team_B_df = pi.team_data(team_B)
             if len(team_A_df) != len(team_B_df):
                 error = True
-        #elif rand_b == 1: # Team B is random, team A is real
-        elif rand_b == '1':
+        elif rand_b == '1': # Team B is random, team A is real
             team_B_df = pi.create_rand_team(5)
             team_A = [int(x) for x in A if x]
             team_A_df = pi.team_data(team_A)

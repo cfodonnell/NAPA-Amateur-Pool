@@ -304,6 +304,24 @@ def create_sql_engine():
     
     return create_engine('postgresql://%s:%s@localhost/%s'%(username,pswd,dbname))
     
+def create_two_rand_teams(num_players):
+    ''' Create two random teams with parameters within typical ranges (to avoid id or name duplication).'''
+    
+    rwins = np.random.rand(num_players*2)*100
+    rskills = np.random.randint(10,120,num_players*2)
+    rgames = np.random.randint(0,100,num_players*2)
+    rppm = rwins*0.14
+    rstate = [np.random.randint(0,25)]*num_players*2
+    rnames = [names.get_full_name() for i in range(0,num_players*2)]
+    rids = np.random.choice(range(1,1000),num_players*2, replace=False)
+    
+    team1 = pd.DataFrame({'Name': rnames[0:num_players], 'ID': rids[0:num_players], 'Win %': rwins[0:num_players], '8 Skill': rskills[0:num_players],
+     '8 Games': rgames[0:num_players], 'AvgPPM': rppm[0:num_players], 'State': rstate[0:num_players]})
+    team2 = pd.DataFrame({'Name': rnames[num_players:num_players*2], 'ID': rids[num_players:num_players*2], 'Win %': rwins[num_players:num_players*2], '8 Skill': rskills[num_players:num_players*2],
+     '8 Games': rgames[num_players:num_players*2], 'AvgPPM': rppm[num_players:num_players*2], 'State': rstate[num_players:num_players*2]})
+    
+    return team1, team2
+                         
 def create_rand_team(num_players):
     ''' Create a random team with parameters within typical ranges.'''
     
@@ -313,7 +331,7 @@ def create_rand_team(num_players):
     rppm = rwins*0.14
     rstate = [np.random.randint(0,25)]*num_players
     rnames = [names.get_full_name() for i in range(0,num_players)]
-    rids = np.random.choice(range(0,1000),num_players, replace=False)
+    rids = np.random.choice(range(1,1000),num_players, replace=False)
     
     return pd.DataFrame({'Name': rnames, 'ID': rids, 'Win %': rwins, '8 Skill': rskills, '8 Games': rgames,
                          'AvgPPM': rppm, 'State': rstate})
