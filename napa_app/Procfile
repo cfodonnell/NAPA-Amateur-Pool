@@ -1,1 +1,1 @@
-web: gunicorn napa:views
+web: gunicorn run:app
