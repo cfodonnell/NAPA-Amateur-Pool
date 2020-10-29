@@ -6,6 +6,7 @@ import pickle
 import copy
 import psycopg2
 import names
+import subprocess
 from itertools import permutations
 from sqlalchemy import create_engine
 
@@ -283,26 +284,42 @@ def calc_score(preds, xa, xb):
     return tot_score, a_points, b_points, pred_score_a.round(), pred_score_b.round(), preds
 
 def open_sql_con():
-    '''Open connection to napa_db database'''
+    '''Open connection to napa_db database.'''
     
-    with open('./sql_id.txt', 'r') as f:
-        cred = [x.replace("'", '').strip() for x in f]
-        dbname = cred[0]
-        username = cred[1]
-        pswd = cred[2]
+    env = 'prod'
     
-    return psycopg2.connect(database = dbname, user = username, host='localhost', password=pswd)
+    if env = 'prod':
+
+        database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        
+        return psycopg2.connect(database_url)
+    else:
+        with open('./sql_id.txt', 'r') as f:
+            cred = [x.replace("'", '').strip() for x in f]
+            dbname = cred[0]
+            username = cred[1]
+            pswd = cred[2]
+    
+        return psycopg2.connect(database = dbname, user = username, host='localhost', password=pswd)
 
 def create_sql_engine():
-    '''Create engine to write to napa_db database'''
+    '''Create engine to write to napa_db database.'''
     
-    with open('./sql_id.txt', 'r') as f:
-        cred = [x.replace("'", '').strip() for x in f]
-        dbname = cred[0]
-        username = cred[1]
-        pswd = cred[2]
+    env = 'prod'
     
-    return create_engine('postgresql://%s:%s@localhost/%s'%(username,pswd,dbname))
+    if env = 'prod':
+
+        database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        
+        return create_engine(database_url)
+    else:
+        with open('./sql_id.txt', 'r') as f:
+            cred = [x.replace("'", '').strip() for x in f]
+            dbname = cred[0]
+            username = cred[1]
+            pswd = cred[2]
+    
+        return create_engine('postgresql://%s:%s@localhost/%s'%(username,pswd,dbname))
     
 def create_two_rand_teams(num_players):
     ''' Create two random teams with parameters within typical ranges (to avoid id or name duplication).'''

@@ -53,7 +53,7 @@ import pandas as pd
 # 9. Player B5
 
     
-@app.route('/input')
+@app.route('/')
 def team_input():
     ''' Request which returns the input page.'''
     
