@@ -6,7 +6,7 @@ import pickle
 import copy
 import psycopg2
 import names
-import subprocess
+import os
 from itertools import permutations
 from sqlalchemy import create_engine
 
@@ -290,7 +290,8 @@ def open_sql_con():
     
     if env == 'prod':
 
-        database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        #database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        database_url = os.environ.get('DATABASE_URL')
         
         return psycopg2.connect(database_url)
     else:
@@ -309,7 +310,8 @@ def create_sql_engine():
     
     if env == 'prod':
 
-        database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        #database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
+        database_url = os.environ.get('DATABASE_URL')
         
         return create_engine(database_url)
     else:
