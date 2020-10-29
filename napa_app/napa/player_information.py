@@ -288,7 +288,7 @@ def open_sql_con():
     
     env = 'prod'
     
-    if env = 'prod':
+    if env == 'prod':
 
         database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
         
@@ -307,7 +307,7 @@ def create_sql_engine():
     
     env = 'prod'
     
-    if env = 'prod':
+    if env == 'prod':
 
         database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
         
