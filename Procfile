@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath napa_app run
+web: gunicorn --pythonpath napa_app napa:app
