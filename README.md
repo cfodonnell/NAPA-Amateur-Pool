@@ -15,4 +15,4 @@ Try the app at magic8billiards.herokuapp.com !
 Player information for both teams is entered by the user on the app homepage. Since there are 5 players on each team, each match has 120 possible permutations! These permutations are fed to a machine learning model which generates a table of predicted outcomes, stored in a central postgreSQL database. 
 During the first round, the optimal first choice player is suggested to the user, who then has the option to select this player or choose another player from their team. After entering the player choice from the opposing team, this individual matchup is added to the database. Subsequently, there are are 24 (120/5) remaining possible permutations. For the second round, the optimal player is calculated based on these remaining permutations. The match continues in this fashion until all 5 players have been selected on each team.
 
-[](images/app_schematic.png)
+![](images/app_schematic.png)
