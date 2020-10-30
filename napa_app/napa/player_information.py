@@ -290,7 +290,6 @@ def open_sql_con():
     
     if env == 'prod':
 
-        #database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
         database_url = os.environ.get('DATABASE_URL')
         
         return psycopg2.connect(database_url)
@@ -310,7 +309,6 @@ def create_sql_engine():
     
     if env == 'prod':
 
-        #database_url = subprocess.run(['heroku', 'config:get', 'DATABASE_URL', '--app', 'magic8billiards'],stdout=subprocess.PIPE).stdout
         database_url = os.environ.get('DATABASE_URL')
         
         return create_engine(database_url)
