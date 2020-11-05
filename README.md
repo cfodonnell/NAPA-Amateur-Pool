@@ -8,7 +8,7 @@ The two main goals of this project were:
 * Can the predictive outcomes be used to inform player selection strategies, in order to maximize a team's chances of victory?
 
 The end product is a Flask web application which team captains can consult in-game to receive an informed suggestion of which player they should choose to play the next individual match.
-Try the app at magic8billiards.herokuapp.com ! 
+Try the app at [www.magic8billiards.herokuapp.com] ! 
 
 ## Overview
 
@@ -16,3 +16,9 @@ Player information for both teams is entered by the user on the app homepage. Si
 During the first round, the optimal first choice player is suggested to the user, who then has the option to select this player or choose another player from their team. After entering the player choice from the opposing team, this individual matchup is added to the database. Subsequently, there are are 24 (120/5) remaining possible permutations. For the second round, the optimal player is calculated based on these remaining permutations. The match continues in this fashion until all 5 players have been selected on each team.
 
 ![](images/app_schematic.png)
+
+## File descriptions
+
+* `napa_app` contains the files for running the Flask web application. See readme inside this folder for a detailed description of contents.
+* `models` contains `model_selection.ipynb`, a notebook detailing the machine learning models that are called when using the application, along with the model pickle files. `old models` contains some inital exploration of NAPA data along with a PDF document describing some inital insights.
+* `tests` contains `random_team_test.ipynb`, which is used to perform simulations of app usage with random team entries. The results of several tests using different player selection methods are also stored here.
