@@ -21,17 +21,28 @@
   <body>
 
     <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #2F3276;">
-      <a href="https://www.napaleagues.com">
+      <!--<a href="https://www.napaleagues.com">
       <img src="static/napa.jpg" alt="" style="width:50px;height:50px;">
-      </a>
-      <a class="navbar-brand mx-auto">Pool Team Captain Match Assistant</a>
+      </a>-->
+      <a class="navbar-brand mx-auto">Match Assistant</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          
+          <li class="nav-item active">
+            <a class="nav-link" href="https://www.magic8billiards.herokuapp.com/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">How to use <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="https://github.com/cfodonnell/NAPA-Amateur-Pool">GitHub <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="https://www.linkedin.com/in/callum-o-donnell/">LinkedIn <span class="sr-only">(current)</span></a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -57,7 +68,7 @@
         
       
       <table class="table table-hover">
-      <tr style='color:black;'><th>Select Player</th><th>Player A</th><th>Player B</th><th>Score coefficient</th></tr>
+      <tr style='color:black;'><th>Select Player</th><th>Player A</th><th>Player B</th><th>Winning probability</th></tr>
       {% for i in range(0,2) %}
       <tr><td><input type="radio" name="fourth_pick" required = "required" value= {{ options.values[i,0] }} </td><td>{{ options.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ options.values[i,2] }}</td><td> {{ "{0:.2f}".format(options.values[i,3]) }}</td></tr>
       {% endfor %}
@@ -87,7 +98,6 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script src="../../assets/js/vendor/popper.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
-    
     
   </body>
 </html>

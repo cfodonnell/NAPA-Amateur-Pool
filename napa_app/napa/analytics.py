@@ -167,7 +167,7 @@ def print_figure_init(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], color = 'darkred', size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Total score coefficient margin')
+    axs[1].set_xlabel('Average winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()
@@ -190,7 +190,7 @@ def print_figure(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], y=[""]*len(cj), hue=cj['round'], palette = ['lightgray', 'darkred'], size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Total score coefficient margin')
+    axs[1].set_xlabel('Average winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()
@@ -235,15 +235,15 @@ def get_pick_clause(lineup):
     return clause
     
 def calc_stds_coef(con, team_A_df, team_B_df):
-    ''' For each remaining possible permutation, find the average total score of each permutation containing each possible player matchup. The best choice for your team to put up is the player who has the lowest standard deviation across their matchups, i.e. regardless of who the opposing team chooses, the average total score coefficient for the subsequent remaining permutations will be approximately the same. '''
+    ''' For each remaining possible permutation, find the average winning probability of each permutation containing each possible player matchup. The best choice for your team to put up is the player who has the lowest standard deviation across their matchups, i.e. regardless of who the opposing team chooses, the average winning probability for the subsequent remaining permutations will be approximately the same. '''
         
     lineup = get_short_lineup(con)
     clause = get_pick_clause(lineup)
         
     query = '''
-    SELECT player_a, id_a, STDDEV_POP(avg_tot_score) as stddev_tot_scores
+    SELECT player_a, id_a, STDDEV_POP(avg_prob) as stddev_prob
     FROM (
-    SELECT a.player_a, a.id_a, a.player_b, AVG(s.score_coef) as avg_tot_score
+    SELECT a.player_a, a.id_a, a.player_b, AVG(s.probability) as avg_prob
     FROM (
     SELECT permutation FROM all_perms ''' + clause + ''') as f 
     JOIN all_perms as a ON f.permutation = a.permutation
@@ -251,40 +251,40 @@ def calc_stds_coef(con, team_A_df, team_B_df):
     GROUP BY a.player_b, a.player_a, a.id_a ) as grouped_scores
     GROUP BY player_a, id_a
     HAVING id_a NOT IN (SELECT id FROM lineup)
-    ORDER BY stddev_tot_scores'''
+    ORDER BY stddev_prob'''
     
     stds = pd.read_sql_query(query,con)
             
     return stds
     
 def calc_coefs(con, team_A_df, player_b, player_b_id):
-    ''' Find the average total score coefficient for all permutations containing the remaining players available on your team versus the player the opposition has chosen. The best choice for your team to put up is the player who has the highest average total score coefficient across all permutations where they play against the opposition's chosen player. Return the dataframe ranked in order of highest to lowest average total score coefficient.'''
+    ''' Find the average winning probability for all permutations containing the remaining players available on your team versus the player the opposition has chosen. The best choice for your team to put up is the player who has the highest average winning probability across all permutations where they play against the opposition's chosen player. Return the dataframe ranked in order of highest to lowest average winning probability.'''
     
     lineup = get_short_lineup(con)
     clause = get_pick_clause(lineup)
     
     query = '''
-    SELECT a.id_a, a.player_a, a.player_b, AVG(s.score_coef) as avg_tot_score
+    SELECT a.id_a, a.player_a, a.player_b, AVG(s.probability) as avg_prob
     FROM (
     SELECT permutation FROM all_perms ''' + clause + ''') as f 
     JOIN all_perms as a ON f.permutation = a.permutation
     JOIN perm_score as s ON a.permutation = s.permutation
     WHERE a.id_b = ''' + str(player_b_id) + '''
     GROUP BY a.id_a, a.player_a, a.player_b
-    ORDER BY avg_tot_score DESC '''
+    ORDER BY avg_prob DESC '''
     
     team_A_df = pd.read_sql_query(query,con)
     
     return team_A_df
     
 def agg_coefs_init(con):
-    ''' Aggregate the score coefficients from each permutation, returning their total values in a dataframe.''' 
+    ''' Aggregate the winning probabilities from each permutation, returning their average values in a dataframe.''' 
 
     lineup = get_short_lineup(con)
     clause = get_clause(lineup)
 
     query = '''
-    SELECT permutation, SUM(score_coef)
+    SELECT permutation, AVG(probability)
     FROM all_perms
     GROUP BY permutation
     '''
@@ -308,17 +308,17 @@ def agg_scores_init(con):
     return pd.DataFrame(scores, columns = ['permutation','r1'])
     
 def agg_coefs(con):
-    ''' Aggregate the score coefficients from each permutation, returning their total values in a dataframe. Futhermore, perform the aggregation on the remaining active permutations and add this an extra column.'''
+    ''' Aggregate the winning probabilities from each permutation, returning their average values in a dataframe. Furthermore, perform the aggregation on the remaining active permutations and add this an extra column.'''
 
     lineup = get_short_lineup(con)
     clause = get_clause(lineup)
 
     query = '''
-    SELECT r1.permutation, r1.sum as r1_coef, r2.tot_score as r2_coef, CASE WHEN r2.tot_score IS NULL THEN 'All Predictions' ELSE 'Active Predictions' END as round
-    FROM (SELECT permutation, SUM(score_coef) FROM all_perms
+    SELECT r1.permutation, r1.avg_prob as r1_coef, r2.tot_score as r2_coef, CASE WHEN r2.tot_score IS NULL THEN 'All Predictions' ELSE 'Active Predictions' END as round
+    FROM (SELECT permutation, AVG(probability) as avg_prob FROM all_perms
     GROUP BY permutation) as r1
     LEFT JOIN
-    (SELECT a.permutation, SUM(a.score_coef) as tot_score
+    (SELECT a.permutation, AVG(a.probability) as tot_score
     FROM (''' + clause + '''
     ) as p
     LEFT JOIN all_perms as a ON p.permutation = a.permutation
@@ -336,7 +336,7 @@ def agg_scores(con):
     
     query = '''
     SELECT r1.permutation, r1.sum as r1_score, r2.tot_score as r2_score
-    FROM (SELECT permutation, SUM(result) FROM all_perms
+    FROM (SELECT permutation, SUM(result) as sum FROM all_perms
     GROUP BY permutation) as r1
     LEFT JOIN
     (SELECT a.permutation, SUM(a.result) as tot_score
@@ -367,31 +367,31 @@ def get_perm(con):
     return pd.read_sql_query(query,con).values[0]
     
 def get_perm_coef(con, perm):
-    ''' Return the active permutation score coef.'''
+    ''' Return the active permutation winning probability.'''
     
     query = '''
-    SELECT score_coef
+    SELECT probability
     FROM perm_score
     WHERE permutation = ''' + str(perm)
     
     return pd.read_sql_query(query,con).values[0][0]
     
 def get_average_coef(con):
-    ''' Return the average score coef over all permutations.'''
+    ''' Return the average winning probability over all permutations.'''
     
     query = '''
-    SELECT AVG(score_coef)
+    SELECT AVG(probability)
     FROM perm_score
     '''
     return pd.read_sql_query(query,con).values[0][0]
     
 def get_perm_rank(con, perm):
-    ''' Return the rank of the permutation, ordered by decreasing total score coef.'''
+    ''' Return the rank of the permutation, ordered by decreasing winning probability.'''
     
     query = '''
     SELECT rank
     FROM
-    (SELECT permutation, score_coef, RANK() OVER(ORDER BY score_coef DESC)
+    (SELECT permutation, probability, RANK() OVER(ORDER BY probability DESC)
     FROM perm_score) as r
     WHERE permutation = ''' + str(perm)
 
@@ -402,9 +402,9 @@ def final_lineup(con, perm):
     ''' Return the final lineup and the score coefficients for the individual matchups.'''
     
     query = '''
-    SELECT player_a, score_coef, player_b FROM all_perms
+    SELECT player_a, probability, player_b FROM all_perms
     WHERE permutation = ''' + str(perm) + '''
-    ORDER BY score_coef DESC
+    ORDER BY probability DESC
     '''
     
     return pd.read_sql_query(query,con).values

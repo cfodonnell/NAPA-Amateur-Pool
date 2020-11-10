@@ -8,7 +8,7 @@ The two main goals of this project were:
 * Can the predictive outcomes be used to inform player selection strategies, in order to maximize a team's chances of victory?
 
 The end product is a Flask web application which team captains can consult in-game to receive an informed suggestion of which player they should choose to play the next individual match.
-Try the app at [www.magic8billiards.herokuapp.com] ! 
+Try the app at [magic8billiards.herokuapp.com](magic8billiards.herokuapp.com) ! 
 
 ## Overview
 

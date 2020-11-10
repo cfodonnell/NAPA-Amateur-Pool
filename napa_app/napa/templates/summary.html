@@ -21,17 +21,28 @@
   <body>
 
     <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #2F3276;">
-      <a href="https://www.napaleagues.com">
+      <!--<a href="https://www.napaleagues.com">
       <img src="static/napa.jpg" alt="" style="width:50px;height:50px;">
-      </a>
-      <a class="navbar-brand mx-auto">Pool Team Captain Match Assistant</a>
+      </a>-->
+      <a class="navbar-brand mx-auto">Match Assistant</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          
+          <li class="nav-item active">
+            <a class="nav-link" href="https://www.magic8billiards.herokuapp.com/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">How to use <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="https://github.com/cfodonnell/NAPA-Amateur-Pool">GitHub <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="https://www.linkedin.com/in/callum-o-donnell/">LinkedIn <span class="sr-only">(current)</span></a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -47,14 +58,14 @@
         
       
       <table class="table table-hover">
-      <tr style='color:black;'><th>Player A</th><th>Score Coefficient</th><th>Player B</th></tr>
+      <tr style='color:black;'><th>Player A</th><th>Winning probability</th><th>Player B</th></tr>
       {% for i in range(0,5) %}
       <tr><td>{{ final[i,0] }} </td><td>{{ "{0:.2f}".format(final[i,1]) }}</td><td> {{ final[i,2] }}</td><td></tr>
       {% endfor %}
       </table>
       
-      <h2>The average score coefficient over all <b>{{tot_perms}}</b> match permutations was <b>{{av_coef}}</b>.</h2>
-      <h2>The total score coefficient for this match permutation was <b>{{perm_coef}}</b>, ranking it <b>{{rank}}</b> out of <b>{{tot_perms}}</b>.</h2>
+      <h2>The average winning probability over all <b>{{tot_perms}}</b> match permutations was <b>{{av_coef}}</b>.</h2>
+      <h2>The average winning probability for this match permutation was <b>{{perm_coef}}</b>, ranking it <b>{{rank}}</b> out of <b>{{tot_perms}}</b>.</h2>
       
       <div>
       <img src="data:image/png;base64, {{ plot_url }}" style="width:1000px;height:400px;padding-bottom:50px">
@@ -74,7 +85,6 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script src="../../assets/js/vendor/popper.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
-    
     
   </body>
 </html>

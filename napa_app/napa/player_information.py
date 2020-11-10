@@ -9,6 +9,7 @@ import names
 import os
 from itertools import permutations
 from sqlalchemy import create_engine
+from scipy.special import logit, expit
 
 class player_data:
     ''' Methods for scraping player data from NAPA website.'''
@@ -123,6 +124,11 @@ def team_data(team):
 
 def load_model():
     return pickle.load(open('optimized_model_xgb.sav', 'rb'))
+    
+def load_models():
+    lin_model = pickle.load(open('lr.pkl', 'rb'))
+    prob_model = pickle.load(open('lr_prob.pkl', 'rb'))
+    return lin_model, prob_model
 
 def get_race(pa, pb):
     ''' This function calculates the respective number of games that player 1 
@@ -363,8 +369,6 @@ def init_db(team_A_df, team_B_df):
     perm = list(permutations(range(0,len(team_B_vals))))
     pms = [list(x) for x in perm]
     
-    model = load_model()
-    
     all_perms = []
     
     for pm_num, pm in enumerate(pms):
@@ -389,11 +393,19 @@ def init_db(team_A_df, team_B_df):
         matchup[:,5] = xa[:,5]
 
         cols = ['Race Margin', 'Win % Margin', 'Skill Margin', 'Game Margin', 'AvgPPM Margin', 'State']
+        lr_cols = ['Race Margin', 'Win % Margin', 'Skill Margin', 'State']
         matchup = pd.DataFrame(matchup, columns = cols)
-        pred_res = model.predict(matchup)
+        
+        # filter the match dataframe to only contain the features required for linear regression
+        matchup = matchup[lr_cols]
+        
+        #model = load_model()
+        #pred_res = model.predict(matchup)
+        lr_mod, prob_mod = load_models()
+        pred_res = lr_mod.predict(matchup)
+        pred_prob = expit(prob_mod.predict(pred_res.reshape(-1,1)))
 
         (score_coef, score_a, score_b, games_a, games_b, coefs) = calc_score(pred_res, xa, xb)
-
         names_a = team_A_df['Name'].values
         names_b = team_B_df['Name'].values[pm]
         ids_a = team_A_df['ID'].values
@@ -403,7 +415,7 @@ def init_db(team_A_df, team_B_df):
         
         perm_df = pd.DataFrame({'permutation': np.array([pm_num]*len(team_A_df)), 'player_a':names_a, 'id_a': ids_a, 'race_a': vec_int(xa[:,0]), 'predicted_games_a': games_a,
                  'predicted_points_a': score_a, 'predicted_points_b': score_b, 'predicted_games_b': games_b,
-                 'race_b': vec_int(xb[:,0]), 'player_b': names_b, 'id_b': ids_b, 'score_coef': coefs})
+                 'race_b': vec_int(xb[:,0]), 'player_b': names_b, 'id_b': ids_b, 'score_coef': coefs, 'probability': pred_prob})
         
         all_perms.append(perm_df)
     
@@ -411,7 +423,8 @@ def init_db(team_A_df, team_B_df):
     all_perms = pd.concat(all_perms)
     all_perms['result'] = all_perms['predicted_points_a'] - all_perms['predicted_points_b']
     perm_score = all_perms.groupby('permutation')['result'].sum() 
-    perm_coefs = all_perms.groupby('permutation')['score_coef'].sum()
+    #perm_coefs = all_perms.groupby('permutation')['score_coef'].sum()
+    perm_coefs = all_perms.groupby('permutation')['probability'].mean()
     perm_score = pd.merge(perm_score, perm_coefs, how='left',on='permutation')   
     engine = create_sql_engine()
     all_perms.to_sql('all_perms', engine, if_exists='replace')
