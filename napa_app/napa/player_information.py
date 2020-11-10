@@ -126,8 +126,8 @@ def load_model():
     return pickle.load(open('optimized_model_xgb.sav', 'rb'))
     
 def load_models():
-    lin_model = pickle.load(open('./lr.pkl', 'rb'))
-    prob_model = pickle.load(open('./lr_prob.pkl', 'rb'))
+    lin_model = pickle.load(open('lr.pkl', 'rb'))
+    prob_model = pickle.load(open('lr_prob.pkl', 'rb'))
     return lin_model, prob_model
 
 def get_race(pa, pb):
