@@ -359,6 +359,17 @@ def create_rand_team(num_players):
     return pd.DataFrame({'Name': rnames, 'ID': rids, 'Win %': rwins, '8 Skill': rskills, '8 Games': rgames,
                          'AvgPPM': rppm, 'State': rstate})
 
+def at_least_three(ps):
+    ''' Return the probability that at least 3 matchups will be won by a player from team A.'''
+
+    coefs = [1]
+    for p in ps:
+        coefs.append(0)
+        for i in range(len(coefs) - 1, 0, -1):
+            coefs[i] = coefs[i] * (1 - p) + coefs[i - 1] * p
+        coefs[0] *= 1 - p
+    return 1 - coefs[0] - coefs[1] - coefs[2]
+
 def init_db(team_A_df, team_B_df):
     ''' Generate the predicted results summary dataframe for the permutation with highest 
     likelihood of team A winning.'''
@@ -370,6 +381,7 @@ def init_db(team_A_df, team_B_df):
     pms = [list(x) for x in perm]
     
     all_perms = []
+    all_probs = []
     
     for pm_num, pm in enumerate(pms):
     
@@ -404,6 +416,7 @@ def init_db(team_A_df, team_B_df):
         lr_mod, prob_mod = load_models()
         pred_res = lr_mod.predict(matchup)
         pred_prob = expit(prob_mod.predict(pred_res.reshape(-1,1)))
+        prob_3win = at_least_three(pred_prob)
 
         (score_coef, score_a, score_b, games_a, games_b, coefs) = calc_score(pred_res, xa, xb)
         names_a = team_A_df['Name'].values
@@ -418,13 +431,14 @@ def init_db(team_A_df, team_B_df):
                  'race_b': vec_int(xb[:,0]), 'player_b': names_b, 'id_b': ids_b, 'score_coef': coefs, 'probability': pred_prob})
         
         all_perms.append(perm_df)
+        all_probs.append(prob_3win)
     
     
     all_perms = pd.concat(all_perms)
     all_perms['result'] = all_perms['predicted_points_a'] - all_perms['predicted_points_b']
     perm_score = all_perms.groupby('permutation')['result'].sum() 
-    #perm_coefs = all_perms.groupby('permutation')['score_coef'].sum()
-    perm_coefs = all_perms.groupby('permutation')['probability'].mean()
+    #perm_coefs = all_perms.groupby('permutation')['probability'].mean()
+    perm_coefs = pd.DataFrame({'permutation': np.arange(len(pms)), 'probability': all_probs})
     perm_score = pd.merge(perm_score, perm_coefs, how='left',on='permutation')   
     engine = create_sql_engine()
     all_perms.to_sql('all_perms', engine, if_exists='replace')

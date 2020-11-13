@@ -284,9 +284,8 @@ def agg_coefs_init(con):
     clause = get_clause(lineup)
 
     query = '''
-    SELECT permutation, AVG(probability)
-    FROM all_perms
-    GROUP BY permutation
+    SELECT permutation, probability
+    FROM perm_score
     '''
     
     coef = pd.read_sql_query(query,con).values
@@ -312,17 +311,15 @@ def agg_coefs(con):
 
     lineup = get_short_lineup(con)
     clause = get_clause(lineup)
-
+    
     query = '''
     SELECT r1.permutation, r1.avg_prob as r1_coef, r2.tot_score as r2_coef, CASE WHEN r2.tot_score IS NULL THEN 'All Predictions' ELSE 'Active Predictions' END as round
-    FROM (SELECT permutation, AVG(probability) as avg_prob FROM all_perms
-    GROUP BY permutation) as r1
+    FROM (SELECT permutation, probability as avg_prob FROM perm_score) as r1
     LEFT JOIN
-    (SELECT a.permutation, AVG(a.probability) as tot_score
+    (SELECT s.permutation, s.probability as tot_score
     FROM (''' + clause + '''
     ) as p
-    LEFT JOIN all_perms as a ON p.permutation = a.permutation
-    GROUP BY a.permutation) as r2 ON r1.permutation = r2.permutation
+    LEFT JOIN perm_score as s ON p.permutation = s.permutation) as r2 ON r1.permutation = r2.permutation
     '''
     
     coef_joined = pd.read_sql_query(query,con).values
@@ -472,3 +469,17 @@ def create_summary(con):
     final = final_lineup(con, active_perm)
     
     return final, tot_perms, perm_coef, av_coef, rank, plot_url
+    
+def similar_skills(con, player_b_id):
+    ''' Find the maximum score coefficient of all players on your team vs the chosen player on the opposing team.'''
+    
+    query = '''
+    SELECT id, ABS(eight_skill - (SELECT eight_skill FROM team_b WHERE id = ''' + str(player_b_id) + '''))
+    AS diffs
+    FROM team_a
+    WHERE id NOT IN (SELECT id FROM lineup)
+    ORDER BY diffs
+    LIMIT 1
+    '''
+    
+    return pd.read_sql_query(query,con).values[0][0] 

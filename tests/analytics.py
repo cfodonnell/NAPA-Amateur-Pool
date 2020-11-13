@@ -5,10 +5,9 @@ import base64
 from io import BytesIO
 from flask import send_file
 from flask import request
-#from napa import player_information as pi
 import player_information as pi
 import matplotlib
-matplotlib.use('Agg') # required to solve multithreading issues with matplotlib within flask
+#matplotlib.use('Agg') # required to solve multithreading issues with matplotlib within flask
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 sb.set_context("talk", font_scale = 1)
@@ -285,9 +284,8 @@ def agg_coefs_init(con):
     clause = get_clause(lineup)
 
     query = '''
-    SELECT permutation, AVG(probability)
-    FROM all_perms
-    GROUP BY permutation
+    SELECT permutation, probability
+    FROM perm_score
     '''
     
     coef = pd.read_sql_query(query,con).values
@@ -313,17 +311,15 @@ def agg_coefs(con):
 
     lineup = get_short_lineup(con)
     clause = get_clause(lineup)
-
+    
     query = '''
     SELECT r1.permutation, r1.avg_prob as r1_coef, r2.tot_score as r2_coef, CASE WHEN r2.tot_score IS NULL THEN 'All Predictions' ELSE 'Active Predictions' END as round
-    FROM (SELECT permutation, AVG(probability) as avg_prob FROM all_perms
-    GROUP BY permutation) as r1
+    FROM (SELECT permutation, probability as avg_prob FROM perm_score) as r1
     LEFT JOIN
-    (SELECT a.permutation, AVG(a.probability) as tot_score
+    (SELECT s.permutation, s.probability as tot_score
     FROM (''' + clause + '''
     ) as p
-    LEFT JOIN all_perms as a ON p.permutation = a.permutation
-    GROUP BY a.permutation) as r2 ON r1.permutation = r2.permutation
+    LEFT JOIN perm_score as s ON p.permutation = s.permutation) as r2 ON r1.permutation = r2.permutation
     '''
     
     coef_joined = pd.read_sql_query(query,con).values
