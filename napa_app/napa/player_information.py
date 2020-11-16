@@ -411,8 +411,6 @@ def init_db(team_A_df, team_B_df):
         # filter the match dataframe to only contain the features required for linear regression
         matchup = matchup[lr_cols]
         
-        #model = load_model()
-        #pred_res = model.predict(matchup)
         lr_mod, prob_mod = load_models()
         pred_res = lr_mod.predict(matchup)
         pred_prob = expit(prob_mod.predict(pred_res.reshape(-1,1)))
@@ -433,24 +431,26 @@ def init_db(team_A_df, team_B_df):
         all_perms.append(perm_df)
         all_probs.append(prob_3win)
     
-    
+    # Initializing the postgreSQL database
+    # Create the all_perms table
+    engine = create_sql_engine()
     all_perms = pd.concat(all_perms)
     all_perms['result'] = all_perms['predicted_points_a'] - all_perms['predicted_points_b']
-    perm_score = all_perms.groupby('permutation')['result'].sum() 
-    #perm_coefs = all_perms.groupby('permutation')['probability'].mean()
-    perm_coefs = pd.DataFrame({'permutation': np.arange(len(pms)), 'probability': all_probs})
-    perm_score = pd.merge(perm_score, perm_coefs, how='left',on='permutation')   
-    engine = create_sql_engine()
     all_perms.to_sql('all_perms', engine, if_exists='replace')
     
-    team_A_df = team_A_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
-    team_B_df = team_B_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
-    
-    team_A_df.to_sql('team_a', engine, if_exists='replace')
-    team_B_df.to_sql('team_b', engine, if_exists='replace')
+    # Create the perm_score table
+    perm_score = all_perms.groupby('permutation')['result'].sum() 
+    perm_coefs = pd.DataFrame({'permutation': np.arange(len(pms)), 'probability': all_probs})
+    perm_score = pd.merge(perm_score, perm_coefs, how='left',on='permutation')   
     perm_score.to_sql('perm_score', engine, if_exists='replace')
     
+    # Create the team tables
+    team_A_df = team_A_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
+    team_B_df = team_B_df[['Name', 'ID', '8 Skill']].rename(columns={'Name': 'name', 'ID':'id', '8 Skill': 'eight_skill'})
+    team_A_df.to_sql('team_a', engine, if_exists='replace')
+    team_B_df.to_sql('team_b', engine, if_exists='replace')
+    
+    # Create an empty lineup table (which will be updated throughout the match)
     lineup = pd.DataFrame({'pos': np.arange(0,10), 'name': np.array(['']*10), 'id': np.zeros(10)})
     lineup.to_sql('lineup', engine, if_exists='replace')
-    
-
+   

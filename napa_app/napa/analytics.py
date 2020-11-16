@@ -157,7 +157,7 @@ def print_figure_init(pj, cj):
     ''' Produce a bar plot visualization of the predicted match points for all permutations. Produce a swarmplot showing predicted raw score coefficients for each permutation.'''
 
     img = BytesIO()
-    fig, axs = plt.subplots(figsize=(15,5), ncols=2)
+    fig, axs = plt.subplots(figsize=(15,5), ncols=2, dpi=300)
 
     sb.despine(left=True)
     sb.countplot(x='r1', data=pj, color='darkred', ax=axs[0])
@@ -167,7 +167,7 @@ def print_figure_init(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], color = 'darkred', size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Average winning probability')
+    axs[1].set_xlabel('Match winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()
@@ -180,7 +180,7 @@ def print_figure(pj, cj):
     ''' Produce a bar plot visualization of the predicted match points for the remaining permutations. Produce a swarmplot showing predicted raw score coefficients for each permutation, with remaining possible permutations highlighted.'''
 
     img = BytesIO()
-    fig, axs = plt.subplots(figsize=(15,5), ncols=2)
+    fig, axs = plt.subplots(figsize=(15,5), ncols=2, dpi=300)
 
     sb.despine(left=True)
     sb.countplot(x='r2', data=pj, color='darkred', ax=axs[0])
@@ -190,7 +190,7 @@ def print_figure(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], y=[""]*len(cj), hue=cj['round'], palette = ['lightgray', 'darkred'], size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Average winning probability')
+    axs[1].set_xlabel('Match winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()

@@ -7,7 +7,7 @@
     <meta name="author" content="">
     <link rel="icon" href="/docs/4.1/assets/img/favicons/favicon.ico">
 
-    <title>Round 4: Choose your player.</title>
+    <title>How to use</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.1/examples/starter-template/">
 
@@ -15,7 +15,7 @@
      <link href="../static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <<link href="../static/css/starter-template.css" rel="stylesheet">
+    <link href="../static/css/starter-template.css" rel="stylesheet">
   </head>
 
   <body>
@@ -24,7 +24,8 @@
       <!--<a href="https://www.napaleagues.com">
       <img src="static/napa.jpg" alt="" style="width:50px;height:50px;">
       </a>-->
-      <a class="navbar-brand mx-auto">Match Assistant</a>
+      <b><a class="navbar-brand mx-auto">Match Assistant</a></b>
+      
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -35,7 +36,7 @@
             <a class="nav-link" href="https://www.magic8billiards.herokuapp.com/">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
-            <a class="nav-link" href="#">How to use <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="https://www.magic8billiards.herokuapp.com/how">How to use <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
             <a class="nav-link" href="https://github.com/cfodonnell/NAPA-Amateur-Pool">GitHub <span class="sr-only">(current)</span></a>
@@ -51,39 +52,26 @@
     <main role="main" class="container">
 
       <div class="starter-template">
-        <h2><b>Round 4: Choose your player.</b></h2>
+        <h2><b>Welcome to Magic8Ball Billiards!</b></h2>
     </div>
 
     <div class = "container">
+    <p>Magic8Ball Billiards is an app designed to guide you through choosing your players during a team match in the North American Poolshooter's Association (NAPA). The player suggestions provided by the app are statistically proven to increase your probability of winning the match by an average of 5%, and boost your points tally an average of 8 more points per match! See below for instructions on how to get started. Full technical details can be found in the GitHub repository linked in the navigation bar.</p>
     
-      <table class="table table-hover">
-      <tr style='color:black;'><th>Player A</th><th></th><th>Player B</th></tr>
-      <tr><td>{{ lineup[0][0] }}</td><td>V</td><td> {{ lineup[1][0] }} </td></tr>
-      <tr><td>{{ lineup[2][0] }}</td><td>V</td><td>{{ lineup[3][0] }}</td></tr>
-      <tr><td>{{ lineup[4][0] }}</td><td>V</td><td>{{ lineup[5][0] }}</td></tr>
-      <tr><td>?</td><td>V</td><td>{{ lineup[7][0] }}</td></tr>
-      </table>
-
-      <form  action="/pick5" method="POST">
-        
-      
-      <table class="table table-hover">
-      <tr style='color:black;'><th>Select Player</th><th>Player A</th><th>Player B</th><th>Average match winning probability</th></tr>
-      {% for i in range(0,2) %}
-      <tr><td><input type="radio" name="fourth_pick" required = "required" value= {{ options.values[i,0] }} </td><td>{{ options.values[i,1] }} <b>{{rec[i]}}</b></td><td>{{ options.values[i,2] }}</td><td> {{ "{0:.2f}".format(options.values[i,3]) }}</td></tr>
-      {% endfor %}
-      </table>
-      
-      <div align = 'center'>
-          <button type="submit" class="btn btn-default btn-lg"  style="color:white;background-color: #2F3276;">Confirm Choice</button>
+    <h3>Loading the players</h3>
+    <p>Enter the NAPA player IDs for your team in the boxes under the heading "Your team" in 5 digit format (e.g. 61781). Enter the player IDs corresponding to the opposing team in the second column. Note: Currently Magic8Ball Billiards only supports 5 v 5 team matches, however functionally for smaller or larger teams will soon be introduced. </p>
+    <p>Alternatively, select "Create Random Team" to generate a list of example players with randomly distributed parameters. </p>
+    <p>When ready, click the "Load Teams" button. Please wait a few seconds to allow the player information to be imported.</p>
+    
+    <h3>Navigating through the match</h3>
+    <p>Once the teams are loaded, you'll see a table containing the players and their skill levels. After the coin toss, use the radio button to select which team will be selecting their player first in round one.</p>
+    
+      <form  action="/" method="POST">
+        <div align = 'center'>
+          <button type="submit" class="btn btn-default btn-lg" style="color:white;background-color: #2F3276;">Get Started!</button>
         </div>
-      
       </form>
       
-      <div>
-      <img src="data:image/png;base64, {{ plot_url }}" style="width:1000px;height:400px;padding-bottom:50px">
-      </div>
-
     </div>
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -99,5 +87,8 @@
     <script src="../../assets/js/vendor/popper.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
     
+    <div align = 'center'>
+    
+    </div>
   </body>
 </html>
