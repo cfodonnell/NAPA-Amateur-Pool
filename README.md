@@ -33,7 +33,9 @@ How could things have gone differently? Well, this strategy was quite high risk,
 
 ![](images/ranks.png)
 
-What does this mean in terms of the winning likelihood? Apart for exceptional cases (involving bonus points), to win a team match in NAPA requires winning 3/5 of the individual matchups. Assuming that each matchup is an independent event, the overall match winning probability can be found by aggregating all the possible player win/loss probabilities for that particular permutation, and summing those outcomes where your team is predicted to win at least 3 of the matchups. In the next graph, the match winning probability distribution is plotted for the 1000 match simulations, for the same two cases previously discussed. 
+What does this mean in terms of the winning likelihood? Apart for exceptional cases (involving bonus points), to win a team match in NAPA requires winning 3/5 of the individual matchups. Assuming that each matchup is an independent event, the overall match winning probability can be found by aggregating all the possible player win/loss probabilities for that particular permutation, and summing those outcomes where your team is predicted to win at least 3 of the matchups. To demonstrate the power of the app, we can compare it to a commonly used strategy: attempting to match the skill levels of your players with similarly skilled players on the opposing team. In the next graph, for each simulated match, the difference between the final match winning probability when following a given strategy and the final match winning probability when making random choices is recorded and plotted. Blue shading corresponds to following the app strategy, while red shading corresponds to the similar skills strategy.
 
-![](images/results_prob.png) 
+![](images/diff_compare.png) 
+
+It might be surprising, but matching player skill levels ends up being no better than making a random choice! In, using app recommendations leads to an increase in winning probability in __98.4%__ of the simulated cases! In real match terms, this corresponds to an average NAPA points increase of __8 points per match__, which could be enough to turn a tight defeat into a win.
 

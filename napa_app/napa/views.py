@@ -264,3 +264,9 @@ def summary():
     con.close()
         
     return render_template('summary.html', final = final, tot_perms = tot_perms, perm_coef = perm_coef, av_coef = av_coef, rank = rank,  plot_url = plot_url)
+    
+@app.route('/how',methods=['GET', 'POST'])
+def how():
+    ''' Welcome page and instructions for use.'''
+        
+    return render_template('how.html')
