@@ -9,7 +9,6 @@ import names
 import os
 from itertools import permutations
 from sqlalchemy import create_engine
-from scipy.special import logit, expit
 
 class player_data:
     ''' Methods for scraping player data from NAPA website.'''
@@ -124,11 +123,11 @@ def team_data(team):
 
 def load_model():
     return pickle.load(open('optimized_model_xgb.sav', 'rb'))
-    
+
 def load_models():
-    lin_model = pickle.load(open('lr.pkl', 'rb'))
-    prob_model = pickle.load(open('lr_prob.pkl', 'rb'))
-    return lin_model, prob_model
+    lin_model = pickle.load(open('lr.pkl','rb'))
+    log_model = pickle.load(open('log.pkl','rb'))
+    return lin_model, log_model
 
 def get_race(pa, pb):
     ''' This function calculates the respective number of games that player 1 
@@ -408,12 +407,12 @@ def init_db(team_A_df, team_B_df):
         lr_cols = ['Race Margin', 'Win % Margin', 'Skill Margin', 'State']
         matchup = pd.DataFrame(matchup, columns = cols)
         
-        # filter the match dataframe to only contain the features required for linear regression
+        # filter the match dataframe to only contain the features required for logistic regression
         matchup = matchup[lr_cols]
         
         lr_mod, prob_mod = load_models()
         pred_res = lr_mod.predict(matchup)
-        pred_prob = expit(prob_mod.predict(pred_res.reshape(-1,1)))
+        pred_prob = prob_mod.predict_proba(matchup)[:,0]
         prob_3win = at_least_three(pred_prob)
 
         (score_coef, score_a, score_b, games_a, games_b, coefs) = calc_score(pred_res, xa, xb)
@@ -453,4 +452,3 @@ def init_db(team_A_df, team_B_df):
     # Create an empty lineup table (which will be updated throughout the match)
     lineup = pd.DataFrame({'pos': np.arange(0,10), 'name': np.array(['']*10), 'id': np.zeros(10)})
     lineup.to_sql('lineup', engine, if_exists='replace')
-   

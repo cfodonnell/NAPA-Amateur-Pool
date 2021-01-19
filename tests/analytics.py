@@ -234,14 +234,14 @@ def get_pick_clause(lineup):
     
     return clause
     
-def calc_stds_coef(con, team_A_df, team_B_df):
+def calc_min_coef(con, team_A_df, team_B_df):
     ''' For each remaining possible permutation, find the average winning probability of each permutation containing each possible player matchup. The best choice for your team to put up is the player who has the lowest standard deviation across their matchups, i.e. regardless of who the opposing team chooses, the average winning probability for the subsequent remaining permutations will be approximately the same. '''
         
     lineup = get_short_lineup(con)
     clause = get_pick_clause(lineup)
         
     query = '''
-    SELECT player_a, id_a, STDDEV_POP(avg_prob) as stddev_prob
+    SELECT player_a, id_a, MIN(avg_prob) as min_prob
     FROM (
     SELECT a.player_a, a.id_a, a.player_b, AVG(s.probability) as avg_prob
     FROM (
@@ -251,11 +251,11 @@ def calc_stds_coef(con, team_A_df, team_B_df):
     GROUP BY a.player_b, a.player_a, a.id_a ) as grouped_scores
     GROUP BY player_a, id_a
     HAVING id_a NOT IN (SELECT id FROM lineup)
-    ORDER BY stddev_prob'''
+    ORDER BY min_prob DESC'''
     
-    stds = pd.read_sql_query(query,con)
+    mins = pd.read_sql_query(query,con)
             
-    return stds
+    return mins
     
 def calc_coefs(con, team_A_df, player_b, player_b_id):
     ''' Find the average winning probability for all permutations containing the remaining players available on your team versus the player the opposition has chosen. The best choice for your team to put up is the player who has the highest average winning probability across all permutations where they play against the opposition's chosen player. Return the dataframe ranked in order of highest to lowest average winning probability.'''

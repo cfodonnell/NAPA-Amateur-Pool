@@ -157,7 +157,7 @@ def print_figure_init(pj, cj):
     ''' Produce a bar plot visualization of the predicted match points for all permutations. Produce a swarmplot showing predicted raw score coefficients for each permutation.'''
 
     img = BytesIO()
-    fig, axs = plt.subplots(figsize=(15,5), ncols=2, dpi=300)
+    fig, axs = plt.subplots(figsize=(15,5), ncols=2)
 
     sb.despine(left=True)
     sb.countplot(x='r1', data=pj, color='darkred', ax=axs[0])
@@ -167,7 +167,7 @@ def print_figure_init(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], color = 'darkred', size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Match winning probability')
+    axs[1].set_xlabel('Average winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()
@@ -180,7 +180,7 @@ def print_figure(pj, cj):
     ''' Produce a bar plot visualization of the predicted match points for the remaining permutations. Produce a swarmplot showing predicted raw score coefficients for each permutation, with remaining possible permutations highlighted.'''
 
     img = BytesIO()
-    fig, axs = plt.subplots(figsize=(15,5), ncols=2, dpi=300)
+    fig, axs = plt.subplots(figsize=(15,5), ncols=2)
 
     sb.despine(left=True)
     sb.countplot(x='r2', data=pj, color='darkred', ax=axs[0])
@@ -190,7 +190,7 @@ def print_figure(pj, cj):
     axs[0].xaxis.set_tick_params(rotation=45)
     g2 = sb.swarmplot(x=cj['r1'], y=[""]*len(cj), hue=cj['round'], palette = ['lightgray', 'darkred'], size=10, ax=axs[1])
     axs[1].legend(loc='best', fontsize='small')
-    axs[1].set_xlabel('Match winning probability')
+    axs[1].set_xlabel('Average winning probability')
     
     plt.savefig(img, format='png', bbox_inches = "tight")
     plt.close()
@@ -256,6 +256,29 @@ def calc_stds_coef(con, team_A_df, team_B_df):
     stds = pd.read_sql_query(query,con)
             
     return stds
+    
+def calc_min_coef(con, team_A_df, team_B_df):
+    ''' For each remaining possible permutation, find the average winning probability of each permutation containing each possible player matchup. The best choice for your team to put up is the player who has the lowest standard deviation across their matchups, i.e. regardless of who the opposing team chooses, the average winning probability for the subsequent remaining permutations will be approximately the same. '''
+        
+    lineup = get_short_lineup(con)
+    clause = get_pick_clause(lineup)
+        
+    query = '''
+    SELECT player_a, id_a, MIN(avg_prob) as min_prob
+    FROM (
+    SELECT a.player_a, a.id_a, a.player_b, AVG(s.probability) as avg_prob
+    FROM (
+    SELECT permutation FROM all_perms ''' + clause + ''') as f 
+    JOIN all_perms as a ON f.permutation = a.permutation
+    JOIN perm_score as s ON a.permutation = s.permutation
+    GROUP BY a.player_b, a.player_a, a.id_a ) as grouped_scores
+    GROUP BY player_a, id_a
+    HAVING id_a NOT IN (SELECT id FROM lineup)
+    ORDER BY min_prob DESC'''
+    
+    mins = pd.read_sql_query(query,con)
+            
+    return mins
     
 def calc_coefs(con, team_A_df, player_b, player_b_id):
     ''' Find the average winning probability for all permutations containing the remaining players available on your team versus the player the opposition has chosen. The best choice for your team to put up is the player who has the highest average winning probability across all permutations where they play against the opposition's chosen player. Return the dataframe ranked in order of highest to lowest average winning probability.'''
@@ -407,13 +430,13 @@ def final_lineup(con, perm):
     return pd.read_sql_query(query,con).values
     
 def a_pick_first(con):
-    ''' When team a is picking first, use the calc_stds_coef function to determine the recommended player. Update which permutations are still active for the visualization.'''
+    ''' When team a is picking first, use the calc_min_coef function to determine the recommended player. Update which permutations are still active for the visualization.'''
         
     lineup = get_lineup(con)
     team_A_df = load_team(con, 'a')
     team_B_df = load_team(con, 'b')
         
-    stds = calc_stds_coef(con, team_A_df, team_B_df)
+    stds = calc_min_coef(con, team_A_df, team_B_df)
     rec =['']*len(team_A_df)
     rec[0] = ' (Recommended)'
         

@@ -7,3 +7,8 @@ sql_id.txt
 depreciated.py
 scraping
 gif
+napa_app/napa/test.py
+tests/results_prob_min_method.csv
+tests/results_prob_new_similar.csv
+tests/results_prob_std_method.csv
+tests/diff_sim_std.png
