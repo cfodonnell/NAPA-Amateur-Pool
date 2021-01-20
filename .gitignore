@@ -12,3 +12,8 @@ tests/results_prob_min_method.csv
 tests/results_prob_new_similar.csv
 tests/results_prob_std_method.csv
 tests/diff_sim_std.png
+napa_app/napa/log.pkl
+napa_app/lr_prob.pkl
+napa_app/optimized_model_xgb.sav
+optimized_model_xgb.sav
+lr_prob.pkl
