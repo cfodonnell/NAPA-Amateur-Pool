@@ -125,7 +125,7 @@ def load_model():
     return pickle.load(open('optimized_model_xgb.sav', 'rb'))
 
 def load_models():
-    #lin_model = pickle.load(open('lr.pkl','rb'))
+    lin_model = pickle.load(open('lr.pkl','rb'))
     log_model = pickle.load(open('log.pkl','rb'))
     return lin_model, log_model
 
